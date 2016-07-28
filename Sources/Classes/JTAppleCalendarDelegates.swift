@@ -189,10 +189,8 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
     /// Asks your data source object for the cell that corresponds to the specified item in the collection view.
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         restoreSelectionStateForCellAtIndexPath(indexPath)
-        
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(cellReuseIdentifier, forIndexPath: indexPath) as! JTAppleDayCell
 
-        return cell
+        return collectionView.dequeueReusableCellWithReuseIdentifier(cellReuseIdentifier, forIndexPath: indexPath)
     }
 
 
