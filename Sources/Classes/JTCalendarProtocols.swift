@@ -136,43 +136,49 @@ protocol JTAppleCalendarDelegateProtocol: class {
 
 
 internal protocol JTAppleReusableViewProtocolTrait: class {
-    associatedtype ViewType: UIView
-    func setupView(cellSource: JTAppleCalendarViewSource)
-    var view: ViewType? {get set}
+
+  associatedtype ViewType: UIView
+
+  var view: ViewType? {get set}
+
+  func setupView(cellSource: JTAppleCalendarViewSource)
+  
 }
 
-extension JTAppleReusableViewProtocolTrait {
-    func setupView(cellSource: JTAppleCalendarViewSource) {
-        if view != nil { return}
-        switch cellSource {
-        case let .fromXib(xibName):
-            let viewObject = UINib(nibName: xibName, bundle: nil).instantiateWithOwner(self, options: nil)
-            guard let view = viewObject[0] as? ViewType else {
-                print("xib file class does not conform to the JTAppleViewProtocol")
-                assert(false)
-                return
-            }
-            self.view = view
-            break
-        case let .fromClassName(className):
-            guard let theCellClass = NSBundle.mainBundle().classNamed(className) as? ViewType.Type else {
-                print("Error loading registered class: '\(className)'")
-                print("Make sure that: \n\n(1) It is a subclass of: 'UIView' and conforms to 'JTAppleViewProtocol' \n(2) You registered your class using the fully qualified name like so -->  'theNameOfYourProject.theNameOfYourClass'\n")
-                assert(false)
-                return
-            }
-            self.view = theCellClass.init()
-            break
-        case let .fromType(cellType):
-            guard let theCellClass = cellType as? ViewType.Type else {
-                print("Error loading registered class: '\(cellType)'")
-                print("Make sure that: \n\n(1) It is a subclass of: 'UIiew' and conforms to 'JTAppleViewProtocol'\n")
-                assert(false)
-                return
-            }
-            self.view = theCellClass.init()
-            break
-        }
-        (self as! UIView).addSubview(view!)
+extension JTAppleReusableViewProtocolTrait where Self: UIView {
+
+  func setupView(cellSource: JTAppleCalendarViewSource) {
+    guard view == nil else {
+      return;
     }
+
+    switch cellSource {
+    case let .fromXib(xibName):
+      let view = UINib(nibName: xibName, bundle: nil).instantiateWithOwner(self, options: nil).first as? ViewType
+      assert(view != nil, "xib file class does not conform to the JTAppleViewProtocol")
+      self.view = view
+      self.addSubview(view!)
+
+    case let .fromClassName(className):
+      guard let theCellClass = NSBundle.mainBundle().classNamed(className) as? ViewType.Type else {
+        print("Error loading registered class: '\(className)'")
+        print("Make sure that: \n\n(1) It is a subclass of: 'UIView' and conforms to 'JTAppleViewProtocol' \n(2) You registered your class using the fully qualified name like so -->  'theNameOfYourProject.theNameOfYourClass'\n")
+        assert(false)
+        return
+      }
+      self.view = theCellClass.init()
+      self.addSubview(view!)
+
+    case let .fromType(cellType):
+      guard let theCellClass = cellType as? ViewType.Type else {
+        print("Error loading registered class: '\(cellType)'")
+        print("Make sure that: \n\n(1) It is a subclass of: 'UIiew' and conforms to 'JTAppleViewProtocol'\n")
+        assert(false)
+        return
+      }
+      self.view = theCellClass.init()
+      self.addSubview(view!)
+    }
+  }
+
 }
