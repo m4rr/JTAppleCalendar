@@ -191,18 +191,27 @@ extension JTAppleCalendarView: UICollectionViewDataSource, UICollectionViewDeleg
         restoreSelectionStateForCellAtIndexPath(indexPath)
         
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(cellReuseIdentifier, forIndexPath: indexPath) as! JTAppleDayCell
-        
-        cell.setupView(cellViewSource)
-        cell.updateCellView(cellInset.x, cellInsetY: cellInset.y)
-        cell.bounds.origin = CGPoint(x: 0, y: 0)
-        
-        let date = dateFromPath(indexPath)!
-        let cellState = cellStateFromIndexPath(indexPath, withDate: date)
-        
-        delegate?.calendar(self, isAboutToDisplayCell: cell.view!, date: date, cellState: cellState)
 
         return cell
     }
+
+
+  public func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+
+    guard let cell = cell as? JTAppleDayCell else {
+      return;
+    }
+
+    cell.setupView(cellViewSource)
+    cell.updateCellView(cellInset.x, cellInsetY: cellInset.y)
+    cell.bounds.origin = CGPoint(x: 0, y: 0)
+
+    let date = dateFromPath(indexPath)!
+    let cellState = cellStateFromIndexPath(indexPath, withDate: date)
+
+    delegate?.calendar(self, isAboutToDisplayCell: cell.view!, date: date, cellState: cellState)
+  }
+
     /// Asks your data source object for the number of sections in the collection view. The number of sections in collectionView.
     public func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return monthInfo.count
